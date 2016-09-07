@@ -9,7 +9,7 @@ import com.sun.jna.ptr.PointerByReference;
 import x.mvmn.gphoto2.jna.Gphoto2Library;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
-public class GP2DetectedCamerasListHelper {
+public class GP2AutodetectCameraHelper {
 
 	public static class CameraListItem {
 		protected final String cameraModel;
@@ -88,7 +88,7 @@ public class GP2DetectedCamerasListHelper {
 	}
 
 	protected static void processPortList(GP2Context gp2Context, Consumer<CameraListItem> consumer) {
-		PointerByReference context = gp2Context.getPointer();
+		PointerByReference context = gp2Context.getPointerByRef();
 
 		final PointerByReference tempList = new PointerByReference();
 		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_list_new(tempList));

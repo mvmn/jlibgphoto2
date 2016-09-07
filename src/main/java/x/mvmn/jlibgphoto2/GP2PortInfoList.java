@@ -27,6 +27,22 @@ public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo>, A
 		list.close();
 	}
 
+	protected static final Map<Integer, String> PORT_TYPE_NAMES;
+
+	static {
+		Map<Integer, String> portTypeNames = new HashMap<Integer, String>();
+		for (Field field : GPPortType.class.getDeclaredFields()) {
+			if (field.getName().startsWith("GP_PORT")) {
+				try {
+					portTypeNames.put(Integer.parseInt(field.get(null).toString()), field.getName());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		PORT_TYPE_NAMES = Collections.unmodifiableMap(portTypeNames);
+	}
+
 	protected final PointerByReference portInfoList;
 	protected final Collection<GP2PortInfo> portInfoItems;
 	protected final Map<String, GP2PortInfo> internalMapPathToGP2PortInfo = new HashMap<String, GP2PortInfo>();
@@ -107,23 +123,12 @@ public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo>, A
 		}
 
 		public String getTypeName() {
-			StringBuilder result = new StringBuilder();
 			int type = getType();
-			for (Field field : GPPortType.class.getDeclaredFields()) {
-				if (field.getName().startsWith("GP_PORT")) {
-					try {
-						if (type == Integer.parseInt(field.get(null).toString())) {
-							if (result.length() > 0) {
-								result.append(", ");
-							}
-							result.append(field.getName());
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
+			String name = PORT_TYPE_NAMES.get(type);
+			if (name == null) {
+				name = String.valueOf(type);
 			}
-			return result.toString();
+			return name;
 		}
 
 		private String getPortInfoStringField(final String fieldName) {
@@ -145,6 +150,5 @@ public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo>, A
 			builder.append("GP2PortInfo [name=").append(getName()).append(", path=").append(getPath()).append(", type=").append(getTypeName()).append("]");
 			return builder.toString();
 		}
-
 	}
 }

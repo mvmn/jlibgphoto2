@@ -12,7 +12,7 @@ public class GP2Context {
 		this.pointer = Gphoto2Library.INSTANCE.gp_context_new();
 	}
 
-	PointerByReference getPointer() {
+	PointerByReference getPointerByRef() {
 		return pointer;
 	}
 }

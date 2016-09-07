@@ -6,20 +6,49 @@ import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 import x.mvmn.gphoto2.jna.Camera;
+import x.mvmn.gphoto2.jna.CameraFilePath;
 import x.mvmn.gphoto2.jna.Gphoto2Library;
-import x.mvmn.jlibgphoto2.GP2DetectedCamerasListHelper.CameraListItem;
+import x.mvmn.gphoto2.jna.Gphoto2Library.CameraCaptureType;
+import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItem;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2Camera implements AutoCloseable {
 
 	public static void main(String args[]) {
 		GP2Context context = new GP2Context();
-		List<CameraListItem> detectedCameras = GP2DetectedCamerasListHelper.autodetectCameras(context);
+		List<CameraListItem> detectedCameras = GP2AutodetectCameraHelper.autodetectCameras(context);
 		GP2PortInfoList portList = new GP2PortInfoList();
 		GP2Camera camera = new GP2Camera(context, portList.getByPath(detectedCameras.iterator().next().getPortName()));
 		System.out.println("Preview file size: " + camera.capturePreview().length);
+		System.out.println(camera.capture());
 		camera.close();
 		portList.close();
+	}
+
+	public static enum GP2CameraCaptureType {
+
+		IMAGE(CameraCaptureType.GP_CAPTURE_IMAGE), MOVIE(CameraCaptureType.GP_CAPTURE_MOVIE), SOUND(CameraCaptureType.GP_CAPTURE_SOUND);
+
+		private int code;
+
+		private GP2CameraCaptureType(final int code) {
+			this.code = code;
+		}
+
+		public int getCode() {
+			return code;
+		}
+
+		public static GP2CameraCaptureType getByCode(final int code) {
+			GP2CameraCaptureType result = null;
+			for (GP2CameraCaptureType val : GP2CameraCaptureType.values()) {
+				if (val.getCode() == code) {
+					result = val;
+					break;
+				}
+			}
+			return result;
+		}
 	}
 
 	protected final GP2Context gp2Context;
@@ -49,11 +78,36 @@ public class GP2Camera implements AutoCloseable {
 			GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_set_port_info(this.cameraByReference, gp2PortInfo.getGpPortInfo()));
 		}
 
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_init(this.cameraByReference, gp2Context.getPointer()));
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_init(this.cameraByReference, gp2Context.getPointerByRef()));
 	}
 
 	Camera.ByReference getCameraByReference() {
 		return cameraByReference;
+	}
+
+	protected void checkClosed() {
+		if (this.closed) {
+			throw new RuntimeException("This GP2Camera instance has already been closed.");
+		}
+	}
+
+	protected PointerByReference internalCapturePreview() {
+		PointerByReference pbrFile = new PointerByReference();
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_new(pbrFile));
+		pbrFile.setPointer(pbrFile.getValue());
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_capture_preview(cameraByReference, pbrFile, gp2Context.getPointerByRef()));
+		return pbrFile;
+	}
+
+	protected byte[] internalGetCameraFileData(PointerByReference cameraFile) {
+		PointerByReference pref = new PointerByReference();
+		LongByReference longByRef = new LongByReference();
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_get_data_and_size(cameraFile, pref, longByRef));
+		return pref.getValue().getByteArray(0, (int) longByRef.getValue());
+	}
+
+	protected void internalFreeCamFileSafely(PointerByReference pbrFile) {
+		Gphoto2Library.INSTANCE.gp_file_unref(pbrFile);
 	}
 
 	public GP2Context getContext() {
@@ -68,12 +122,6 @@ public class GP2Camera implements AutoCloseable {
 		this.closed = true;
 	}
 
-	protected void checkClosed() {
-		if (this.closed) {
-			throw new RuntimeException("This GP2Camera instance has already been closed.");
-		}
-	}
-
 	/**
 	 * Close connection to camera (see libgphoto2 gp_camera_exit).<br/>
 	 * <br/>
@@ -84,7 +132,7 @@ public class GP2Camera implements AutoCloseable {
 	 */
 	public void release() {
 		checkClosed();
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_exit(cameraByReference, gp2Context.getPointer()));
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_exit(cameraByReference, gp2Context.getPointerByRef()));
 	}
 
 	public byte[] capturePreview() {
@@ -96,22 +144,15 @@ public class GP2Camera implements AutoCloseable {
 		return result;
 	}
 
-	protected PointerByReference internalCapturePreview() {
-		PointerByReference pbrFile = new PointerByReference();
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_new(pbrFile));
-		pbrFile.setPointer(pbrFile.getValue());
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_capture_preview(cameraByReference, pbrFile, gp2Context.getPointer()));
-		return pbrFile;
+	public CameraFilePathBean capture() {
+		return capture(GP2CameraCaptureType.IMAGE);
 	}
 
-	protected byte[] internalGetCameraFileData(PointerByReference cameraFile) {
-		PointerByReference pref = new PointerByReference();
-		LongByReference longByRef = new LongByReference();
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_get_data_and_size(cameraFile, pref, longByRef));
-		return pref.getValue().getByteArray(0, (int) longByRef.getValue());
+	public CameraFilePathBean capture(final GP2CameraCaptureType captureType) {
+		CameraFilePath.ByReference refCameraFilePath = new CameraFilePath.ByReference();
+		GP2ErrorHelper.checkResult(
+				Gphoto2Library.INSTANCE.gp_camera_capture(cameraByReference, captureType.getCode(), refCameraFilePath, gp2Context.getPointerByRef()));
+		return new CameraFilePathBean(refCameraFilePath);
 	}
 
-	protected void internalFreeCamFileSafely(PointerByReference pbrFile) {
-		Gphoto2Library.INSTANCE.gp_file_unref(pbrFile);
-	}
 }
