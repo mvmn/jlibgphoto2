@@ -131,14 +131,23 @@ public class CameraConfigEntryBean {
 	}
 
 	public CameraConfigEntryBean cloneWithNewValue(String strValue) {
+		if (this.getType().getValueType() != CameraConfigEntryValueType.STRING) {
+			throw new RuntimeException("Setting STRING value instead of expected " + this.getType().getValueType());
+		}
 		return new CameraConfigEntryBean(id, path, label, info, type, intValue, floatValue, strValue, range, choices);
 	}
 
 	public CameraConfigEntryBean cloneWithNewValue(int intValue) {
+		if (this.getType().getValueType() != CameraConfigEntryValueType.INT) {
+			throw new RuntimeException("Setting INT value instead of expected " + this.getType().getValueType());
+		}
 		return new CameraConfigEntryBean(id, path, label, info, type, intValue, floatValue, strValue, range, choices);
 	}
 
 	public CameraConfigEntryBean cloneWithNewValue(float floatValue) {
+		if (this.getType().getValueType() != CameraConfigEntryValueType.FLOAT) {
+			throw new RuntimeException("Setting FLOAT value instead of expected " + this.getType().getValueType());
+		}
 		return new CameraConfigEntryBean(id, path, label, info, type, intValue, floatValue, strValue, range, choices);
 	}
 
