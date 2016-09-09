@@ -27,12 +27,10 @@ public class GP2CameraFilesHelper {
 
 	public static void main(String[] args) throws Exception {
 		GP2Camera camera = new GP2Camera();
-		camera.capture();
-		camera.waitForSpecificEvent(1000, CameraEventType.GP_EVENT_CAPTURE_COMPLETE);
-		camera.capture();
-		camera.waitForSpecificEvent(1000, CameraEventType.GP_EVENT_CAPTURE_COMPLETE);
-		camera.capture();
-		camera.waitForSpecificEvent(1000, CameraEventType.GP_EVENT_CAPTURE_COMPLETE);
+		for (int i = 0; i < 3; i++) {
+			System.out.println(camera.capture());
+			camera.waitForSpecificEvent(1000, CameraEventType.GP_EVENT_CAPTURE_COMPLETE);
+		}
 		final JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
