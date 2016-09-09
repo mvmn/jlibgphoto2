@@ -1,5 +1,6 @@
 package x.mvmn.jlibgphoto2;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.sun.jna.ptr.LongByReference;
@@ -7,6 +8,7 @@ import com.sun.jna.ptr.PointerByReference;
 
 import x.mvmn.gphoto2.jna.Camera;
 import x.mvmn.gphoto2.jna.CameraFilePath;
+import x.mvmn.gphoto2.jna.CameraText;
 import x.mvmn.gphoto2.jna.Gphoto2Library;
 import x.mvmn.gphoto2.jna.Gphoto2Library.CameraCaptureType;
 import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItem;
@@ -19,6 +21,7 @@ public class GP2Camera implements AutoCloseable {
 		List<CameraListItem> detectedCameras = GP2AutodetectCameraHelper.autodetectCameras(context);
 		GP2PortInfoList portList = new GP2PortInfoList();
 		GP2Camera camera = new GP2Camera(context, portList.getByPath(detectedCameras.iterator().next().getPortName()));
+		System.out.println(camera.getSummary());
 		System.out.println("Preview file size: " + camera.capturePreview().length);
 		System.out.println(camera.capture());
 		camera.close();
@@ -155,4 +158,13 @@ public class GP2Camera implements AutoCloseable {
 		return new CameraFilePathBean(refCameraFilePath);
 	}
 
+	public String getSummary() {
+		CameraText.ByReference byRefCameraText = new CameraText.ByReference();
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_get_summary(cameraByReference, byRefCameraText, gp2Context.getPointerByRef()));
+		try {
+			return new String(byRefCameraText.text, "ASCII");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
