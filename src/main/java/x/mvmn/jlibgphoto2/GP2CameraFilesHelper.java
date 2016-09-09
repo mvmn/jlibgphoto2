@@ -27,8 +27,11 @@ public class GP2CameraFilesHelper {
 	public static void main(String[] args) throws Exception {
 		GP2Camera camera = new GP2Camera();
 		camera.capture();
+		Thread.sleep(3000);
 		camera.capture();
+		Thread.sleep(3000);
 		camera.capture();
+		Thread.sleep(3000);
 		final JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
