@@ -1,9 +1,8 @@
 package x.mvmn.jlibgphoto2;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import com.sun.jna.ptr.LongByReference;
+import com.sun.jna.Native;
 import com.sun.jna.ptr.PointerByReference;
 
 import x.mvmn.gphoto2.jna.Camera;
@@ -15,6 +14,8 @@ import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItem;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2Camera implements AutoCloseable {
+
+	protected static final String NATIVE_STRING_ENCODING = System.getProperty("jlibgphoto2.camerafilepath.encoding", "ASCII");
 
 	public static void main(String args[]) {
 		GP2Context context = new GP2Context();
@@ -102,17 +103,6 @@ public class GP2Camera implements AutoCloseable {
 		return pbrFile;
 	}
 
-	protected byte[] internalGetCameraFileData(PointerByReference cameraFile) {
-		PointerByReference pref = new PointerByReference();
-		LongByReference longByRef = new LongByReference();
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_get_data_and_size(cameraFile, pref, longByRef));
-		return pref.getValue().getByteArray(0, (int) longByRef.getValue());
-	}
-
-	protected void internalFreeCamFileSafely(PointerByReference pbrFile) {
-		Gphoto2Library.INSTANCE.gp_file_unref(pbrFile);
-	}
-
 	public GP2Context getContext() {
 		checkClosed();
 		return gp2Context;
@@ -142,29 +132,26 @@ public class GP2Camera implements AutoCloseable {
 		checkClosed();
 
 		PointerByReference pbrFile = internalCapturePreview();
-		byte[] result = internalGetCameraFileData(pbrFile);
-		internalFreeCamFileSafely(pbrFile);
+		byte[] result = GP2CameraFilesHelper.internalGetCameraFileData(pbrFile);
+		GP2CameraFilesHelper.internalFreeCameraFileSafely(pbrFile);
 		return result;
 	}
 
-	public CameraFilePathBean capture() {
+	public CameraFileSystemEntryBean capture() {
 		return capture(GP2CameraCaptureType.IMAGE);
 	}
 
-	public CameraFilePathBean capture(final GP2CameraCaptureType captureType) {
+	public CameraFileSystemEntryBean capture(final GP2CameraCaptureType captureType) {
 		CameraFilePath.ByReference refCameraFilePath = new CameraFilePath.ByReference();
 		GP2ErrorHelper.checkResult(
 				Gphoto2Library.INSTANCE.gp_camera_capture(cameraByReference, captureType.getCode(), refCameraFilePath, gp2Context.getPointerByRef()));
-		return new CameraFilePathBean(refCameraFilePath);
+		return new CameraFileSystemEntryBean(Native.toString(refCameraFilePath.name, NATIVE_STRING_ENCODING),
+				Native.toString(refCameraFilePath.folder, NATIVE_STRING_ENCODING), false);
 	}
 
 	public String getSummary() {
 		CameraText.ByReference byRefCameraText = new CameraText.ByReference();
 		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_get_summary(cameraByReference, byRefCameraText, gp2Context.getPointerByRef()));
-		try {
-			return new String(byRefCameraText.text, "ASCII");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return Native.toString(byRefCameraText.text, NATIVE_STRING_ENCODING);
 	}
 }

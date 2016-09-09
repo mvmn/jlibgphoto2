@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import x.mvmn.gphoto2.jna.Gphoto2Library;
+import x.mvmn.jlibgphoto2.exception.GPhotoCameraBusyExceptoon;
 import x.mvmn.jlibgphoto2.exception.GPhotoException;
 
 public class GP2ErrorHelper {
@@ -32,9 +33,13 @@ public class GP2ErrorHelper {
 		if (result < Gphoto2Library.GP_OK) {
 			String errorName = ERROR_CODES.get(result);
 			if (errorName == null) {
-				errorName = String.valueOf(result);
+				errorName = "Unknown error";
 			}
-			throw new GPhotoException(errorName);
+			if (result == Gphoto2Library.GP_ERROR_CAMERA_BUSY) {
+				throw new GPhotoCameraBusyExceptoon();
+			} else {
+				throw new GPhotoException(result, errorName);
+			}
 		} else {
 			return result;
 		}
