@@ -183,6 +183,22 @@ public class CameraConfigEntryBean {
 		return strValue;
 	}
 
+	public Object getValue() {
+		Object result = null;
+		switch (type.valueType) {
+			case STRING:
+				result = getStrValue();
+			break;
+			case FLOAT:
+				result = getFloatValue();
+			break;
+			case INT:
+				result = getIntValue();
+			break;
+		}
+		return result;
+	}
+
 	public CameraConfigEntryBean.Range getRange() {
 		return range;
 	}
