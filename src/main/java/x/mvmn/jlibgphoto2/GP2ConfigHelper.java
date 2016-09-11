@@ -47,10 +47,10 @@ public class GP2ConfigHelper {
 
 	public static void setConfig(GP2Camera camera, CameraConfigEntryBean... newValues) {
 		PointerByReference pbrCameraConfigRoot = new PointerByReference();
+		GP2ErrorHelper.checkResult(
+				Gphoto2Library.INSTANCE.gp_camera_get_config(camera.getCameraByReference(), pbrCameraConfigRoot, camera.getContext().getPointerByRef()));
+		pbrCameraConfigRoot.setPointer(pbrCameraConfigRoot.getValue());
 		try {
-			GP2ErrorHelper.checkResult(
-					Gphoto2Library.INSTANCE.gp_camera_get_config(camera.getCameraByReference(), pbrCameraConfigRoot, camera.getContext().getPointerByRef()));
-			pbrCameraConfigRoot.setPointer(pbrCameraConfigRoot.getValue());
 			for (CameraConfigEntryBean newVal : newValues) {
 				PointerByReference pbrCameraConfigWidget = new PointerByReference();
 				pbrCameraConfigWidget.setPointer(pbrCameraConfigRoot.getPointer());
