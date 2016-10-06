@@ -11,7 +11,8 @@ import x.mvmn.gphoto2.jna.CameraFilePath;
 import x.mvmn.gphoto2.jna.CameraText;
 import x.mvmn.gphoto2.jna.Gphoto2Library;
 import x.mvmn.gphoto2.jna.Gphoto2Library.CameraCaptureType;
-import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItem;
+import x.mvmn.gphoto2.jna.Gphoto2Library.CameraEventType;
+import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItemBean;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2Camera implements AutoCloseable {
@@ -20,7 +21,7 @@ public class GP2Camera implements AutoCloseable {
 
 	public static void main(String args[]) {
 		GP2Context context = new GP2Context();
-		List<CameraListItem> detectedCameras = GP2AutodetectCameraHelper.autodetectCameras(context);
+		List<CameraListItemBean> detectedCameras = GP2AutodetectCameraHelper.autodetectCameras(context);
 		GP2PortInfoList portList = new GP2PortInfoList();
 		GP2Camera camera = new GP2Camera(context, portList.getByPath(detectedCameras.iterator().next().getPortName()));
 		System.out.println(camera.getSummary());
@@ -47,6 +48,32 @@ public class GP2Camera implements AutoCloseable {
 		public static GP2CameraCaptureType getByCode(final int code) {
 			GP2CameraCaptureType result = null;
 			for (GP2CameraCaptureType val : GP2CameraCaptureType.values()) {
+				if (val.getCode() == code) {
+					result = val;
+					break;
+				}
+			}
+			return result;
+		}
+	}
+
+	public static enum GP2CameraEventType {
+		CAPTURE_COMPLETE(CameraEventType.GP_EVENT_CAPTURE_COMPLETE), FILE_ADDED(CameraEventType.GP_EVENT_FILE_ADDED), FOLDER_ADDED(
+				CameraEventType.GP_EVENT_FOLDER_ADDED), TIMEOUT(CameraEventType.GP_EVENT_TIMEOUT), UNKNOWN(CameraEventType.GP_EVENT_UNKNOWN);
+
+		private int code;
+
+		private GP2CameraEventType(final int code) {
+			this.code = code;
+		}
+
+		public int getCode() {
+			return code;
+		}
+
+		public static GP2CameraEventType getByCode(final int code) {
+			GP2CameraEventType result = null;
+			for (GP2CameraEventType val : GP2CameraEventType.values()) {
 				if (val.getCode() == code) {
 					result = val;
 					break;
@@ -156,31 +183,23 @@ public class GP2Camera implements AutoCloseable {
 		return Native.toString(byRefCameraText.text, NATIVE_STRING_ENCODING);
 	}
 
-	public int waitForSpecificEvent(int timeout, int expectedEventType) {
+	public int waitForSpecificEvent(int timeout, GP2CameraEventType expectedEventType) {
 		int eventType = -1;
 		long startTime = System.currentTimeMillis();
 		long timeLeft = timeout;
 		do {
 			eventType = waitForEvent((int) timeLeft);
 			timeLeft = timeout - (System.currentTimeMillis() - startTime);
-		} while (timeLeft > 0 && eventType != expectedEventType);
+		} while (timeLeft > 0 && eventType != expectedEventType.getCode());
 		return eventType;
 	}
 
 	public int waitForEvent(int timeout) {
-		// CameraFilePath cameraFilePath = new CameraFilePath.ByReference();
 		PointerByReference eventData = new PointerByReference();
-		// eventData.setPointer(cameraFilePath.getPointer());
 		IntBuffer ibEventType = IntBuffer.allocate(1);
 		GP2ErrorHelper.checkResult(
 				Gphoto2Library.INSTANCE.gp_camera_wait_for_event(cameraByReference, timeout, ibEventType, eventData, gp2Context.getPointerByRef()));
-		// CameraFilePath cameraFilePath = new CameraFilePath(eventData.getValue());
 		int eventType = ibEventType.get(0);
-		/*
-		 * if (eventType == Gphoto2Library.CameraEventType.GP_EVENT_FILE_ADDED || eventType == Gphoto2Library.CameraEventType.GP_EVENT_FOLDER_ADDED) {
-		 * System.out.println(new CameraFileSystemEntryBean(Native.toString(cameraFilePath.name, NATIVE_STRING_ENCODING), Native.toString(cameraFilePath.folder,
-		 * NATIVE_STRING_ENCODING), eventType == Gphoto2Library.CameraEventType.GP_EVENT_FOLDER_ADDED)); }
-		 */
 		return eventType;
 	}
 }

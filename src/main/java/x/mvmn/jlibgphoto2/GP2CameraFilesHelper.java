@@ -19,8 +19,8 @@ import com.sun.jna.ptr.PointerByReference;
 
 import x.mvmn.gphoto2.jna.CameraFileInfo;
 import x.mvmn.gphoto2.jna.Gphoto2Library;
-import x.mvmn.gphoto2.jna.Gphoto2Library.CameraEventType;
 import x.mvmn.gphoto2.jna.Gphoto2Library.CameraFileType;
+import x.mvmn.jlibgphoto2.GP2Camera.GP2CameraEventType;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2CameraFilesHelper {
@@ -29,7 +29,7 @@ public class GP2CameraFilesHelper {
 		GP2Camera camera = new GP2Camera();
 		for (int i = 0; i < 3; i++) {
 			System.out.println(camera.capture());
-			camera.waitForSpecificEvent(1000, CameraEventType.GP_EVENT_CAPTURE_COMPLETE);
+			camera.waitForSpecificEvent(1000, GP2CameraEventType.CAPTURE_COMPLETE);
 		}
 		final JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

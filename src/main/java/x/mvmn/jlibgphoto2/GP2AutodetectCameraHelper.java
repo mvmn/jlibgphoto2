@@ -11,11 +11,11 @@ import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2AutodetectCameraHelper {
 
-	public static class CameraListItem {
+	public static class CameraListItemBean {
 		protected final String cameraModel;
 		protected final String portName;
 
-		public CameraListItem(String cameraModel, String portName) {
+		public CameraListItemBean(String cameraModel, String portName) {
 			super();
 			this.cameraModel = cameraModel;
 			this.portName = portName;
@@ -53,7 +53,7 @@ public class GP2AutodetectCameraHelper {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			CameraListItem other = (CameraListItem) obj;
+			CameraListItemBean other = (CameraListItemBean) obj;
 			if (cameraModel == null) {
 				if (other.cameraModel != null)
 					return false;
@@ -70,16 +70,16 @@ public class GP2AutodetectCameraHelper {
 
 	public static void main(String args[]) {
 		GP2Context context = new GP2Context();
-		for (CameraListItem cameraListItem : autodetectCameras(context)) {
+		for (CameraListItemBean cameraListItem : autodetectCameras(context)) {
 			System.out.println(cameraListItem);
 		}
 	}
 
-	public static List<CameraListItem> autodetectCameras(GP2Context gp2Context) {
-		final List<CameraListItem> result = new ArrayList<CameraListItem>();
+	public static List<CameraListItemBean> autodetectCameras(GP2Context gp2Context) {
+		final List<CameraListItemBean> result = new ArrayList<CameraListItemBean>();
 
-		processPortList(gp2Context, new Consumer<CameraListItem>() {
-			public void accept(CameraListItem item) {
+		processPortList(gp2Context, new Consumer<CameraListItemBean>() {
+			public void accept(CameraListItemBean item) {
 				result.add(item);
 			}
 		});
@@ -87,7 +87,7 @@ public class GP2AutodetectCameraHelper {
 		return result;
 	}
 
-	protected static void processPortList(GP2Context gp2Context, Consumer<CameraListItem> consumer) {
+	protected static void processPortList(GP2Context gp2Context, Consumer<CameraListItemBean> consumer) {
 		PointerByReference context = gp2Context.getPointerByRef();
 
 		final PointerByReference tempList = new PointerByReference();
@@ -116,7 +116,7 @@ public class GP2AutodetectCameraHelper {
 						final String path = pvalue.getValue().getString(0);
 						if (path.startsWith("usb:")) { // Why only USB? IDK, but that's what gp_camera_autodetect does
 							// https://github.com/gphoto/libgphoto2/blob/master/libgphoto2/gphoto2-camera.c#L654
-							CameraListItem item = new CameraListItem(model, path);
+							CameraListItemBean item = new CameraListItemBean(model, path);
 							if (consumer != null) {
 								consumer.accept(item);
 							}
