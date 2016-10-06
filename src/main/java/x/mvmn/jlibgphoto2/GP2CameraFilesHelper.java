@@ -27,7 +27,7 @@ public class GP2CameraFilesHelper {
 
 	public static void main(String[] args) throws Exception {
 		GP2Camera camera = new GP2Camera();
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 1; i++) {
 			System.out.println(camera.capture());
 			camera.waitForSpecificEvent(1000, GP2CameraEventType.CAPTURE_COMPLETE);
 		}
@@ -40,7 +40,7 @@ public class GP2CameraFilesHelper {
 		for (CameraFileSystemEntryBean fsEntry : list(camera, "/", true, true)) {
 			System.out.println(fsEntry);
 			if (fsEntry.isFile()) {
-				System.out.println(getFileInfo(camera, fsEntry.getPath(), fsEntry.getName()).file);
+				System.out.println(getFileInfo(camera, fsEntry.getPath(), fsEntry.getName()));
 				if (fsEntry.getName().toLowerCase().endsWith(".jpg")) {
 					final BufferedImage image = ImageIO.read(new ByteArrayInputStream(getCameraFileContents(camera, fsEntry.getPath(), fsEntry.getName())));
 					tabPane.addTab(fsEntry.getPath() + fsEntry.getName(), new JLabel(new ImageIcon(image)));
@@ -121,7 +121,7 @@ public class GP2CameraFilesHelper {
 	}
 
 	// TODO: Make a wrapper for camera file info
-	public static CameraFileInfo getFileInfo(final GP2Camera camera, final String path, final String fileName) {
+	public static CameraFileInfoBean getFileInfo(final GP2Camera camera, final String path, final String fileName) {
 		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName);
 		CameraFileInfo.ByReference byRefCameraFileInfo;
 		try {
@@ -131,7 +131,7 @@ public class GP2CameraFilesHelper {
 		} finally {
 			internalFreeCameraFileSafely(pbrCameraFile);
 		}
-		return byRefCameraFileInfo;
+		return new CameraFileInfoBean(byRefCameraFileInfo);
 	}
 
 	public static byte[] getCameraFileContents(final GP2Camera camera, final String path, final String fileName) {
