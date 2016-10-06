@@ -1,6 +1,7 @@
 package x.mvmn.jlibgphoto2;
 
 import java.nio.IntBuffer;
+import java.util.EnumSet;
 import java.util.List;
 
 import com.sun.jna.Native;
@@ -183,23 +184,27 @@ public class GP2Camera implements AutoCloseable {
 		return Native.toString(byRefCameraText.text, NATIVE_STRING_ENCODING);
 	}
 
-	public int waitForSpecificEvent(int timeout, GP2CameraEventType expectedEventType) {
-		int eventType = -1;
-		long startTime = System.currentTimeMillis();
+	public GP2CameraEventType waitForSpecificEvent(int timeout, GP2CameraEventType... expectedEventTypes) {
+		return waitForSpecificEvent(timeout, EnumSet.of(expectedEventTypes[0], expectedEventTypes));
+	}
+	
+	public GP2CameraEventType waitForSpecificEvent(int timeout, EnumSet<GP2CameraEventType> expectedEventTypes) {
+		GP2CameraEventType receivedEvent = null;
+		final long startTime = System.currentTimeMillis();
 		long timeLeft = timeout;
 		do {
-			eventType = waitForEvent((int) timeLeft);
+			receivedEvent = waitForEvent((int) timeLeft);
 			timeLeft = timeout - (System.currentTimeMillis() - startTime);
-		} while (timeLeft > 0 && eventType != expectedEventType.getCode());
-		return eventType;
+		} while (timeLeft > 0 && expectedEventTypes.contains(receivedEvent));
+		return receivedEvent;
 	}
 
-	public int waitForEvent(int timeout) {
-		PointerByReference eventData = new PointerByReference();
-		IntBuffer ibEventType = IntBuffer.allocate(1);
+	public GP2CameraEventType waitForEvent(int timeout) {
+		final PointerByReference eventData = new PointerByReference();
+		final IntBuffer ibEventType = IntBuffer.allocate(1);
 		GP2ErrorHelper.checkResult(
 				Gphoto2Library.INSTANCE.gp_camera_wait_for_event(cameraByReference, timeout, ibEventType, eventData, gp2Context.getPointerByRef()));
-		int eventType = ibEventType.get(0);
-		return eventType;
+		final int eventType = ibEventType.get(0);
+		return GP2CameraEventType.getByCode(eventType);
 	}
 }
