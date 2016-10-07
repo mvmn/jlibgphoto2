@@ -37,7 +37,12 @@ public class GP2CameraFilesHelper {
 		frame.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
 		JTabbedPane tabPane = new JTabbedPane();
 		frame.getContentPane().add(tabPane, BorderLayout.CENTER);
-		for (CameraFileSystemEntryBean fsEntry : list(camera, "/", true, true)) {
+		System.out.println("Folders:");
+		for (CameraFileSystemEntryBean fsEntry : list(camera, "/", false, true, true)) {
+			System.out.println(fsEntry);
+		}
+		System.out.println("Files:");
+		for (CameraFileSystemEntryBean fsEntry : list(camera, "/", false, true)) {
 			System.out.println(fsEntry);
 			if (fsEntry.isFile()) {
 				System.out.println(getFileInfo(camera, fsEntry.getPath(), fsEntry.getName()));
@@ -63,14 +68,19 @@ public class GP2CameraFilesHelper {
 	}
 
 	public static List<CameraFileSystemEntryBean> list(final GP2Camera camera, final String path, final boolean includeFolders, final boolean recursive) {
+		return list(camera, path, true, includeFolders, recursive);
+	}
+
+	public static List<CameraFileSystemEntryBean> list(final GP2Camera camera, final String path, final boolean inclueFiles, final boolean includeFolders,
+			final boolean recursive) {
 		final List<CameraFileSystemEntryBean> result;
-		List<String> folders;
+		final List<String> folders;
 		if (includeFolders || recursive) {
 			folders = internalList(camera, path, true);
 		} else {
 			folders = Collections.emptyList();
 		}
-		List<String> files = internalList(camera, path, false);
+		final List<String> files = inclueFiles ? internalList(camera, path, false) : Collections.emptyList();
 		result = new ArrayList<CameraFileSystemEntryBean>((folders != null ? folders.size() : 0) + (files != null ? files.size() : 0));
 		if (folders != null && (includeFolders || recursive)) {
 			for (String folder : folders) {
@@ -78,7 +88,7 @@ public class GP2CameraFilesHelper {
 					result.add(new CameraFileSystemEntryBean(folder, path, true));
 				}
 				if (recursive) {
-					result.addAll(list(camera, path + folder + "/", includeFolders, true));
+					result.addAll(list(camera, path + folder + "/", inclueFiles, includeFolders, true));
 				}
 			}
 		}
