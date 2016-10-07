@@ -1,6 +1,6 @@
 package x.mvmn.jlibgphoto2;
 
-public class CameraFileSystemEntryBean {
+public class CameraFileSystemEntryBean implements Comparable<CameraFileSystemEntryBean> {
 
 	protected final String name;
 	protected final String path;
@@ -67,5 +67,12 @@ public class CameraFileSystemEntryBean {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CameraFileSystemEntryBean [name=").append(name).append(", path=").append(path).append(", folder=").append(folder).append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(CameraFileSystemEntryBean other) {
+		String fp = (this.getPath() != null ? this.getPath() : "") + "/" + (this.getName() != null ? this.getName() : "");
+		String fpOther = (other.getPath() != null ? other.getPath() : "") + "/" + (other.getName() != null ? other.getName() : "");
+		return fp.compareTo(fpOther);
 	}
 }
