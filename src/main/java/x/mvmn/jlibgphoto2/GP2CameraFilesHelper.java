@@ -80,7 +80,7 @@ public class GP2CameraFilesHelper {
 		} else {
 			folders = Collections.emptyList();
 		}
-		final List<String> files = inclueFiles ? internalList(camera, path, false) : Collections.emptyList();
+		final List<String> files = inclueFiles ? internalList(camera, path, false) : null;
 		result = new ArrayList<CameraFileSystemEntryBean>((folders != null ? folders.size() : 0) + (files != null ? files.size() : 0));
 		if (folders != null && (includeFolders || recursive)) {
 			for (String folder : folders) {
@@ -130,7 +130,6 @@ public class GP2CameraFilesHelper {
 		return result;
 	}
 
-	// TODO: Make a wrapper for camera file info
 	public static CameraFileInfoBean getFileInfo(final GP2Camera camera, final String path, final String fileName) {
 		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName);
 		CameraFileInfo.ByReference byRefCameraFileInfo;
