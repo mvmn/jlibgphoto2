@@ -109,6 +109,8 @@ public class CameraConfigEntryBean {
 	protected final String label;
 	protected final String info;
 	protected final CameraConfigEntryType type;
+	// For JSON serialization
+	protected final CameraConfigEntryValueType valueType;
 	protected final Integer intValue;
 	protected final Float floatValue;
 	protected final String strValue;
@@ -123,6 +125,7 @@ public class CameraConfigEntryBean {
 		this.label = label;
 		this.info = info;
 		this.type = type;
+		this.valueType = type != null ? type.getValueType() : null;
 		this.intValue = intValue;
 		this.floatValue = floatValue;
 		this.strValue = strValue;
@@ -169,6 +172,10 @@ public class CameraConfigEntryBean {
 
 	public CameraConfigEntryType getType() {
 		return type;
+	}
+
+	public CameraConfigEntryValueType getValueType() {
+		return valueType;
 	}
 
 	public Integer getIntValue() {
