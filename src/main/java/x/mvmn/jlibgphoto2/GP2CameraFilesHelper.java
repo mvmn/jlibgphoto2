@@ -131,7 +131,7 @@ public class GP2CameraFilesHelper {
 	}
 
 	public static CameraFileInfoBean getFileInfo(final GP2Camera camera, final String path, final String fileName) {
-		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName);
+		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName, CameraFileType.GP_FILE_TYPE_NORMAL);
 		CameraFileInfo.ByReference byRefCameraFileInfo;
 		try {
 			byRefCameraFileInfo = new CameraFileInfo.ByReference();
@@ -144,7 +144,12 @@ public class GP2CameraFilesHelper {
 	}
 
 	public static byte[] getCameraFileContents(final GP2Camera camera, final String path, final String fileName) {
-		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName);
+		return getCameraFileContents(camera, path, fileName, false);
+	}
+
+	public static byte[] getCameraFileContents(final GP2Camera camera, final String path, final String fileName, boolean preview) {
+		final PointerByReference pbrCameraFile = internalGetCameraFile(camera, path, fileName,
+				preview ? CameraFileType.GP_FILE_TYPE_PREVIEW : CameraFileType.GP_FILE_TYPE_NORMAL);
 		byte[] result;
 		try {
 			result = internalGetCameraFileData(pbrCameraFile);
@@ -159,12 +164,12 @@ public class GP2CameraFilesHelper {
 				Gphoto2Library.INSTANCE.gp_camera_file_delete(camera.getCameraByReference(), path, fileName, camera.getContext().getPointerByRef()));
 	}
 
-	static PointerByReference internalGetCameraFile(final GP2Camera camera, final String path, final String fileName) {
+	static PointerByReference internalGetCameraFile(final GP2Camera camera, final String path, final String fileName, int type) {
 		final PointerByReference pbrCameraFile = new PointerByReference();
 		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_file_new(pbrCameraFile));
 		pbrCameraFile.setPointer(pbrCameraFile.getValue());
-		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_file_get(camera.getCameraByReference(), path, fileName, CameraFileType.GP_FILE_TYPE_NORMAL,
-				pbrCameraFile, camera.getContext().getPointerByRef()));
+		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_camera_file_get(camera.getCameraByReference(), path, fileName, type, pbrCameraFile,
+				camera.getContext().getPointerByRef()));
 
 		return pbrCameraFile;
 	}

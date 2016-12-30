@@ -187,7 +187,7 @@ public class GP2Camera implements AutoCloseable {
 	public GP2CameraEventType waitForSpecificEvent(int timeout, GP2CameraEventType... expectedEventTypes) {
 		return waitForSpecificEvent(timeout, EnumSet.of(expectedEventTypes[0], expectedEventTypes));
 	}
-	
+
 	public GP2CameraEventType waitForSpecificEvent(int timeout, EnumSet<GP2CameraEventType> expectedEventTypes) {
 		GP2CameraEventType receivedEvent = null;
 		final long startTime = System.currentTimeMillis();
