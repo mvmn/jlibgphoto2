@@ -48,7 +48,7 @@ public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo>, A
 	protected final Map<String, GP2PortInfo> internalMapPathToGP2PortInfo = new HashMap<String, GP2PortInfo>();
 	protected volatile boolean closed = false;
 
-	GP2PortInfoList() {
+	public GP2PortInfoList() {
 		final PointerByReference portInfoList = new PointerByReference();
 		GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_port_info_list_new(portInfoList));
 		portInfoList.setPointer(portInfoList.getValue());
