@@ -17,7 +17,7 @@ import x.mvmn.gphoto2.jna.Gphoto2Library.GPPortInfo;
 import x.mvmn.gphoto2.jna.Gphoto2Library.GPPortType;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
-public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo>, AutoCloseable {
+public class GP2PortInfoList implements Iterable<GP2PortInfoList.GP2PortInfo> {
 
 	public static void main(String args[]) {
 		GP2PortInfoList list = new GP2PortInfoList();

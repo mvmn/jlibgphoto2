@@ -2,7 +2,6 @@ package x.mvmn.jlibgphoto2;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.sun.jna.ptr.PointerByReference;
 
@@ -73,6 +72,10 @@ public class GP2AutodetectCameraHelper {
 		for (CameraListItemBean cameraListItem : autodetectCameras(context)) {
 			System.out.println(cameraListItem);
 		}
+	}
+
+	public static interface Consumer<T> {
+		public void accept(T t);
 	}
 
 	public static List<CameraListItemBean> autodetectCameras(GP2Context gp2Context) {

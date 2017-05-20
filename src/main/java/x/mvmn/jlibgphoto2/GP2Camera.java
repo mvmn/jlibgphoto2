@@ -16,7 +16,7 @@ import x.mvmn.gphoto2.jna.Gphoto2Library.CameraEventType;
 import x.mvmn.jlibgphoto2.GP2AutodetectCameraHelper.CameraListItemBean;
 import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
-public class GP2Camera implements AutoCloseable {
+public class GP2Camera {
 
 	protected static final String NATIVE_STRING_ENCODING = System.getProperty("jlibgphoto2.camerafilepath.encoding", "ASCII");
 
