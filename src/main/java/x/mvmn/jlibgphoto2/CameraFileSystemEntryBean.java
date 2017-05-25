@@ -69,7 +69,6 @@ public class CameraFileSystemEntryBean implements Comparable<CameraFileSystemEnt
 		return builder.toString();
 	}
 
-	@Override
 	public int compareTo(CameraFileSystemEntryBean other) {
 		String fp = (this.getPath() != null ? this.getPath() : "") + "/" + (this.getName() != null ? this.getName() : "");
 		String fpOther = (other.getPath() != null ? other.getPath() : "") + "/" + (other.getName() != null ? other.getName() : "");
