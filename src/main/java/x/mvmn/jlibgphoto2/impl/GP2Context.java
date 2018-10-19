@@ -1,4 +1,4 @@
-package x.mvmn.jlibgphoto2;
+package x.mvmn.jlibgphoto2.impl;
 
 import com.sun.jna.ptr.PointerByReference;
 
@@ -12,7 +12,7 @@ public class GP2Context {
 		this.pointer = Gphoto2Library.INSTANCE.gp_context_new();
 	}
 
-	PointerByReference getPointerByRef() {
+	protected PointerByReference getPointerByRef() {
 		return pointer;
 	}
 }

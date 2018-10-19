@@ -1,4 +1,4 @@
-package x.mvmn.jlibgphoto2;
+package x.mvmn.jlibgphoto2.api;
 
 import java.util.Arrays;
 
@@ -50,7 +50,6 @@ public class CameraConfigEntryBean {
 		protected final float step;
 
 		public Range(float min, float max, float step) {
-			super();
 			this.min = min;
 			this.max = max;
 			this.step = step;
@@ -119,7 +118,6 @@ public class CameraConfigEntryBean {
 
 	public CameraConfigEntryBean(int id, String path, String label, String info, CameraConfigEntryType type, Integer intValue, Float floatValue,
 			String strValue, CameraConfigEntryBean.Range range, String[] choices) {
-		super();
 		this.id = id;
 		this.path = path;
 		this.label = label;

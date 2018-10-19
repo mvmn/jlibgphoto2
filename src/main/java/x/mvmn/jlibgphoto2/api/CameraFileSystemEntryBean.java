@@ -1,4 +1,4 @@
-package x.mvmn.jlibgphoto2;
+package x.mvmn.jlibgphoto2.api;
 
 public class CameraFileSystemEntryBean implements Comparable<CameraFileSystemEntryBean> {
 

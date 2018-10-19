@@ -1,4 +1,4 @@
-package x.mvmn.jlibgphoto2;
+package x.mvmn.jlibgphoto2.impl;
 
 import java.lang.reflect.Field;
 import java.nio.IntBuffer;
