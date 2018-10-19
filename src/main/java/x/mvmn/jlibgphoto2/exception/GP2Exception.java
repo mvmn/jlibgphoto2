@@ -7,27 +7,27 @@ public class GP2Exception extends RuntimeException {
 	protected final int code;
 
 	public GP2Exception(final int code) {
-		super();
+		super("GP2 error code: " + code);
 		this.code = code;
 	}
 
 	public GP2Exception(final int code, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+		super(message + ". GP2 error code: " + code, cause, enableSuppression, writableStackTrace);
 		this.code = code;
 	}
 
 	public GP2Exception(final int code, String message, Throwable cause) {
-		super(message, cause);
+		super(message + ". GP2 error code: " + code, cause);
 		this.code = code;
 	}
 
 	public GP2Exception(final int code, String message) {
-		super(message);
+		super(message + ". GP2 error code: " + code);
 		this.code = code;
 	}
 
 	public GP2Exception(final int code, Throwable cause) {
-		super(cause);
+		super("GP2 error code: " + code, cause);
 		this.code = code;
 	}
 
