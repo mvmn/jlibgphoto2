@@ -18,7 +18,7 @@ import x.mvmn.jlibgphoto2.util.GP2ErrorHelper;
 
 public class GP2Camera {
 
-	protected static final String NATIVE_STRING_ENCODING = System.getProperty("jlibgphoto2.camerafilepath.encoding", "ASCII");
+	protected static final String NATIVE_STRING_ENCODING = System.getProperty("jlibgphoto2.stringencoding", "ASCII");
 
 	public static void main(String args[]) {
 		GP2Context context = new GP2Context();
