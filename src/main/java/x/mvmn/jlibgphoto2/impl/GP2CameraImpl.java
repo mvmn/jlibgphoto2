@@ -359,17 +359,17 @@ public class GP2CameraImpl implements GP2Camera {
 			switch (configEntryType.getValueType()) {
 				case STRING:
 					PointerByReference byRefPointer = new PointerByReference();
-					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefPointer));
+					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefPointer.getPointer()));
 					strValue = byRefPointer.getValue() != null ? byRefPointer.getValue().getString(0) : ""; // Not sure if null-check is necessary
 				break;
 				case FLOAT:
 					FloatByReference byRefFloat = new FloatByReference();
-					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefFloat));
+					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefFloat.getPointer()));
 					floatValue = byRefFloat.getValue();
 				break;
 				case INT:
 					IntByReference byRefInteger = new IntByReference();
-					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefInteger));
+					GP2ErrorHelper.checkResult(Gphoto2Library.INSTANCE.gp_widget_get_value(parentWidget, byRefInteger.getPointer()));
 					intValue = byRefInteger.getValue();
 				break;
 				default:
