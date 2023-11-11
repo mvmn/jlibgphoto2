@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>x.mvmn.jlibgphoto2</groupId>
 	<artifactId>jlibgphoto2</artifactId>
-	<version>2.0</version>
+	<version>2.1.1</version>
 
 	<dependencies>
 		<dependency>
 			<groupId>x.mvmn.gphoto2</groupId>
 			<artifactId>gphoto2-jna</artifactId>
-			<version>1.1</version>
+			<version>1.2.1</version>
 		</dependency>
 	</dependencies>
 
@@ -20,8 +20,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>
